@@ -10,7 +10,7 @@ export function Edit() {
   const { columns, name } = useConfiguration();
   const { code, error, generate } = useTemplate({
     parameters: {
-      columns,
+      columns: columns.filter((x) => !x.exclude),
       name,
       slug: toSlug(name),
       camelCaseName: toCamelCase(name),

@@ -1,4 +1,4 @@
-export type DataType = "int" | "varchar" | "bit" | "datetime" | "decimal";
+export type DataType = "int" | "varchar" | "bit" | "datetime" | "decimal" | "nvarchar";
 export type ColumnType = "text" | "number" | "checkbox" | "date" | "select" | "time" | "custom";
 
 export type BaseMeta = {

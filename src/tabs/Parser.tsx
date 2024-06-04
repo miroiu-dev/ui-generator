@@ -8,7 +8,7 @@ import { parse } from "../lib/parser";
 const query = (name: string) => `select    
     '{ columnName: ''' + COLUMN_NAME + ''', ' + 
      ' isNullable: ' + ( case IS_NULLABLE when 'YES' then 'true' else 'false' end ) + ', ' + 
-     ' dataType: ''' + DATA_TYPE + ''', '
+     ' dataType: ''' + DATA_TYPE + ''' }, '
 from    INFORMATION_SCHEMA.COLUMNS   
 where    TABLE_NAME = '${name}' `;
 

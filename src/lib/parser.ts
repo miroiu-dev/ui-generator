@@ -14,6 +14,7 @@ function sqlTypeToColumnType(sqlType: DataType): ColumnType {
     case "int":
       return "number";
     case "varchar":
+    case "nvarchar":
       return "text";
     case "bit":
       return "checkbox";
