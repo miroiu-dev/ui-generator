@@ -1,0 +1,191 @@
+// page.tsx
+import { EditExtrasProvider } from "@/contexts/extras";
+import { EditExtrasHeader, EditExtrasBody } from "./_controls";
+import { AuthorizationContainer } from "@/components/shared/page";
+import { ADMIN } from "@/constants/roles.constant";
+
+export default function Page({ params }: { params: { id: string } }) {
+  return (
+    <AuthorizationContainer roles={[ADMIN]}>
+      <div className="flex flex-col gap-4 h-full font-segoe">
+        <Edit<%= it.name %>Provider id={params.id}>
+          <div className="flex flex-col w-full gap-[theme(spacing.sp16)] fullHD:gap-[theme(spacing.sp16)] QHD:gap-[theme(spacing.sp18)] ultraHD:gap-[theme(spacing.sp20)]">
+            <Edit<%= it.name %>Header params={params} />
+            <Edit<%= it.name %>Body />
+          </div>
+        </Edit<%= it.name %>Provider>
+      </div>
+    </AuthorizationContainer>
+  );
+}
+
+// header.tsx
+type Edit<%= it.name %>HeaderProps = {
+  params: {
+    id: string | number;
+  };
+};
+
+export default function Edit<%= it.name %>Header({ params }: Edit<%= it.name %>HeaderProps) {
+  return (
+    <div className="flex w-full gap-[theme(spacing.sp16)] fullHD:gap-[theme(spacing.sp16)] QHD:gap-[theme(spacing.sp18)] ultraHD:gap-[theme(spacing.sp20)]">
+      <h3 className="text-2xl fullHD:text-[1.75rem] QHD:text-[2.188rem] ultraHD:text-[2.75rem] font-normal">
+        {params.id === "create" ? "New <%= it.name %>" : "Edit <%= it.name %>"}
+      </h3>
+    </div>
+  );
+}
+
+// body.tsx
+
+"use client";
+
+const validationSchema = object({});
+
+export function <%= it.name %>Body() {
+  const { alertState, closeAlert, showAlert } = useAlert();
+
+  const onFormSubmit = async (
+    values: <%= it.name %>,
+    helpers: FormikHelpers<<%= it.name %>>
+  ) => {
+    try {
+      // code
+    } catch (err: any) {
+      const response = err.details as ApiNotificationResponse;
+
+      showAlert(
+        response.notificationStatus.toLocaleLowerCase() as AlertType,
+        response.notificationMessage
+      );
+    } finally {
+      helpers.setSubmitting(false);
+    }
+  };
+
+  return (
+    <>
+      <AlertNotification
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
+      />
+      <Formik<<%= it.name %>>
+        initialValues={{} as <%= it.name %>}
+        onSubmit={onFormSubmit}
+        validationSchema={validationSchema}
+      >
+        {({ touched, errors, isSubmitting, values, setFieldValue }) => {
+          const validatorProps = { touched, errors };
+
+          return (
+            <Form className="mb-16">
+              <FormContainer>
+                <AdaptableCard>
+                  <div className="flex flex-col w-1/2">
+<% it.columns.forEach(column => { %>
+<% if(column.dataType === "text") { %>
+                    <FormRow label="<%= column.header %>" name="<%= column.accessorKey %>" {...validatorProps}>
+                      <Field
+                        type="text"
+                        autoComplete="off"
+                        name="<%= column.accessorKey %>"
+                        component={Input}
+                      />
+                    </FormRow>
+<% } else if(column.dataType === "select") { %>
+                    <FormRow label="<%= column.header %>" name="<%= column.accessorKey %>" {...validatorProps}>
+                        <Field name="<%= column.accessorKey %>">
+                          {({ field, form }: FieldProps<FormOption<unknown>>) => (
+                            <Select
+                              field={field}
+                              form={form}
+                              getOptionValue={(option: FormOption<unknown>) => option.value}
+                              getOptionLabel={(option: FormOption<unknown>) => option.label}
+                              options={[]}
+                              value={[].find(
+                                (option: FormOption<unknown>) => option.value === values.<%= column.accessorKey %>
+                              )}
+                              onChange={(option: FormOption<unknown>) =>
+                              form.setFieldValue(field.name, option.value)
+                              }
+                              menuPlacement="auto"
+                              menuPortalTarget={document.body}
+                             />
+                         )}
+                        </Field>
+                    </FormRow>
+<% } else if(column.dataType === "checkbox") { %>
+                    <FormRow
+                         name="<%= column.accessorKey %>"
+                         label="<%= column.header %>"
+                         {...validatorProps}
+                         >
+                            <Field name="<%= column.accessorKey %>">
+                              {({ field, form }: FieldProps<boolean, FormValues>) => (
+                                <Checkbox
+                                  checked={field.value}
+                                  onChange={(checked: boolean) =>
+                                    form.setFieldValue(field.name, checked)
+                                  }
+                                />
+                              )}
+                        </Field>
+                    </FormRow>
+<% } else if(column.dataType === "time") { %>
+                    <FormRow
+                        label="<%= column.header %>"
+                        name="<%= column.accessorKey %>"
+                        {...validatorProps}
+                    >
+                        <TimeInput
+                          value={getValidDate(values.<%= column.accessorKey %> as DateKind)}
+                          onChange={(date: Date) => {}}
+                        />
+                    </FormRow>
+<% } else if(column.dataType === "date") { %>
+                    <FormRow label="<%= column.header %>" name="<%= column.accessorKey %>" {...validatorProps}>
+                        <Field name="<%= column.accessorKey %>">
+                        {({ field, form }: FieldProps<DateKind, FormValues>) => (
+                            <DatePicker
+                              value={getValidDate(field.<%= column.accessorKey %> as DateKind)}
+                              inputFormat="DD-MM-YYYY"
+                              onChange={(date: Date) => {}}
+                            />
+                        )}
+                        </Field>
+                    </FormRow>
+<% } else if(column.dataType === "number") { %>
+                    <FormRow
+                        label="<%= column.header %>"
+                        name="<%= column.accessorKey %>"
+                        {...validatorProps}
+                    >
+                        <Field name="<%= column.accessorKey %>">
+                        {({ field, form }: FieldProps<number | undefined>) => (
+                            <NumberInput
+                                value={field.value}
+                                onChange={value => form.setFieldValue("<%= column.accessorKey %>", value)}
+                                allowDecimals={false}
+                                name="<%= column.accessorKey %>"
+                                field={field}
+                            />
+                        )}
+                        </Field>
+                    </FormRow>
+<% } %>
+<% }) %>
+                  </div>
+                </AdaptableCard>
+                <FormActions
+                  isSubmitting={isSubmitting}
+                />
+              </FormContainer>
+            </Form>
+          );
+        }}
+      </Formik>
+    </>
+  );
+}

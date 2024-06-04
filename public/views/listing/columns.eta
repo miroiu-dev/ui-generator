@@ -1,0 +1,179 @@
+// getColumns.tsx
+
+import { TableColumn } from "@/lib/types";
+
+export const getColumns = (): TableColumn<<%= it.name %>>[] => [
+<% it.columns.forEach(column => { %>
+    {
+        header: '<%= column.header %>',
+        accessorKey: '<%= column.accessorKey %>',
+        enableSorting: <%= column.enableSorting %>,
+<% if(!column.editable) { %>
+        cell: (props) => {
+            const { <%= column.accessorKey %> } = props.row.original;
+            return (
+<% if(column.dataType === "date") { %>
+                <span>
+                       {formatDate(<%= column.accessorKey %>, "dd-mm-yyyy")}
+                </span>
+<% } else if(column.dataType === "checkbox") { %>
+                <>
+                    {<%= column.accessorKey %> ? (
+                      <TableIcons iconType={Icons.valid} />
+                    ) : (
+                      <TableIcons iconType={Icons.invalid} />
+                    )}
+                </>
+<% } else if(column.dataType === "time") { %>
+                <span>
+                    {formatTime(<%= column.accessorKey %>)}
+                </span>
+<% } else { %>
+                <span>
+                    {<%= column.accessorKey %>}
+                </span>
+<% } %>
+            );
+        }
+<% } else { %>
+        meta: {
+            type: '<%= column.meta.type %>',
+<% if(column.meta.isDisabled) { %>
+            isDisabled: <%= column.meta.isDisabled %>,
+<% } %>
+<% if(column.meta.inline) { %>
+            inline: <%= column.meta.inline %>,
+<% } %>
+<% if(column.meta.className) { %>
+            className: '<%= column.meta.className %>',
+<% } %>
+<% if(column.meta.type === "number") { %>
+<% if(column.meta.allowNegative) { %>
+            allowNegative: <%= column.meta.allowNegative %>,
+<% } %>
+<% if(column.meta.fixedDecimalScale) { %>
+            fixedDecimalScale: <%= column.meta.fixedDecimalScale %>,
+<% } %>
+<% if(column.meta.decimalScale !== 2) { %>
+            decimalScale: <%= column.meta.decimalScale %>,
+<% } %>
+<% } %>
+<% if(column.meta.type === "select") { %>
+            options: [],
+<% } %>
+<% if(column.meta.type === "custom") { %>
+            customColumn: (row, value, updateValue) => <span></span>,
+<% } %>
+        }
+<% } %>
+    },
+<% }) %>]
+
+// header.tsx
+import { ActionLink } from "@/components/shared";
+import { Button } from "@/components/ui";
+
+export default function <%= it.name %>Header() {
+  return (
+    <div className="flex justify-between w-full gap-[theme(spacing.sp16)] fullHD:gap-[theme(spacing.sp16)] QHD:gap-[theme(spacing.sp18)] ultraHD:gap-[theme(spacing.sp20)]">
+      <h3 className="text-2xl fullHD:text-[1.75rem] QHD:text-[2.188rem] ultraHD:text-[2.75rem] font-normal">
+        <%= it.name + "\n" %>
+      </h3>
+      <ActionLink to="/<%= it.slug %>/create" underline={false}>
+        <Button size="sm" variant="solid" className="px-8 font-bold">
+          Create
+        </Button>
+      </ActionLink>
+    </div>
+  );
+}
+
+// body.tsx
+
+"use client";
+
+import { AdaptableCard, DataTable, Loading } from "@/components/shared";
+import { useUserContext } from "@/contexts/users";
+import { WebClient } from "@/lib/utils/httpClient";
+import { usePagination } from "@/utils/hooks/usePagination";
+import { useEffect, useMemo, useState } from "react";
+import { getColumns } from "./getColumns";
+
+export default function <%= it.name %>Body() {
+  const [tableData, setTableData] = useState<<%= it.name %>[]>([]);
+  const [tableLength, setTableLength] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const { onPageIndexChange, onPageSizeChange, pageIndex, pageSize } = usePagination();
+  const userContext = useUserContext();
+  const isEmpty = !isLoading && tableData?.length === 0;
+
+  const <%= it.camelCaseName %>Api = useMemo(() => {
+    const webClient = new WebClient(userContext.token);
+    return new <%= it.name %>Api(webClient);
+  }, [userContext.token]);
+
+  useEffect(() => {
+    const get<%= it.pluralName %> = async () => {
+      setIsLoading(true);
+      const { <%= it.pluralNameCamelCase %>, totalCount } = await <%= it.camelCaseName %>Api.get(
+        (pageIndex - 1) * pageSize,
+        pageSize
+      );
+
+      setTableData(<%= it.pluralNameCamelCase %>);
+      setTableLength(totalCount);
+
+      setIsLoading(false);
+    };
+
+    get<%= it.pluralName %>();
+  }, [<%= it.camelCaseName %>Api, pageIndex, pageSize]);
+
+  const columns = getColumns();
+
+  return (
+    <AdaptableCard>
+      <Loading loading={!userContext.token}>
+        {isEmpty && <p>There are no entries to show.</p>}
+        {!isEmpty && (
+          <div className="overflow-x-auto overflow-y-hidden">
+            <DataTable
+              columns={columns}
+              data={tableData}
+              loading={isLoading}
+              selectable={false}
+              pagingData={{
+                pageIndex,
+                pageSize,
+                total: tableLength,
+              }}
+              onPaginationChange={onPageIndexChange}
+              onSelectChange={onPageSizeChange}
+            />
+          </div>
+        )}
+      </Loading>
+    </AdaptableCard>
+  );
+}
+
+// page.tsx
+
+"use client";
+import  <%= it.name %>Body from "./_controls/<%= it.camelCaseName %>Body";
+import  <%= it.name %>Header from "./_controls/<%= it.camelCaseName %>Header";
+import { AuthorizationContainer } from "@/components/shared/page";
+import { ADMIN } from "@/constants/roles.constant";
+
+export default function Page() {
+  return (
+    <AuthorizationContainer roles={[ADMIN]}>
+      <div className="flex flex-col gap-4 h-full font-segoe relative">
+        <div className="flex flex-col w-full gap-[theme(spacing.sp16)] fullHD:gap-[theme(spacing.sp16)] QHD:gap-[theme(spacing.sp18)] ultraHD:gap-[theme(spacing.sp20)]">
+          <<%= it.name %>Header />
+          <<%= it.name %>Body />
+        </div>
+      </div>
+    </AuthorizationContainer>
+  );
+}
