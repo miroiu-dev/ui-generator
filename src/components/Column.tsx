@@ -41,6 +41,19 @@ export function Column({ column }: ColumnProps) {
         </DataList.Value>
       </DataList.Item>
       <DataList.Item>
+        <DataList.Label>Is Link</DataList.Label>
+        <DataList.Value>
+          <Checkbox
+            checked={column.isLink}
+            onCheckedChange={(checked) =>
+              updateColumn(column.accessorKey, {
+                isLink: checked as boolean,
+              })
+            }
+          />
+        </DataList.Value>
+      </DataList.Item>
+      <DataList.Item>
         <DataList.Label>Enable Sorting</DataList.Label>
         <DataList.Value>
           <Checkbox

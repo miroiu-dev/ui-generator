@@ -77,6 +77,7 @@ function mapToTableColumns(columns: DbColumn[]): Column[] {
       header: column.columnName,
       dataType,
       exclude: false,
+      isLink: false,
       meta: {
         type: dataType,
         isDisabled: false,

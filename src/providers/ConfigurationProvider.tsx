@@ -7,6 +7,8 @@ export type ConfigurationContext = {
   text: string;
   setText: Dispatch<SetStateAction<string>>;
   setName: Dispatch<SetStateAction<string>>;
+  setIsDeletable: Dispatch<SetStateAction<boolean>>;
+  isDeletable: boolean;
   columns: Column[];
   setColumns: Dispatch<SetStateAction<Column[]>>;
   updateColumn: (columnName: string, data: Partial<Column>) => void;
@@ -23,6 +25,7 @@ export const ConfigurationContext = createContext<ConfigurationContext | undefin
 
 export function ConfigurationProvider({ children }: PropsWithChildren) {
   const [text, setText] = useLocalStorage("text", example);
+  const [isDeletable, setIsDeletable] = useLocalStorage("isDeletable", true);
   const [name, setName] = useLocalStorage("name", "Customer");
   const [columns, setColumns] = useLocalStorage<Column[]>("columns", []);
   const [isEditable, setIsEditable] = useLocalStorage<boolean>("isEditable", false);
@@ -68,7 +71,20 @@ export function ConfigurationProvider({ children }: PropsWithChildren) {
 
   return (
     <ConfigurationContext.Provider
-      value={{ name, text, setText, setName, columns, setColumns, updateColumn, updateColumnMeta, makeEditable, isEditable }}
+      value={{
+        name,
+        text,
+        setText,
+        setName,
+        columns,
+        setColumns,
+        updateColumn,
+        updateColumnMeta,
+        makeEditable,
+        isEditable,
+        isDeletable,
+        setIsDeletable,
+      }}
     >
       {children}
     </ConfigurationContext.Provider>

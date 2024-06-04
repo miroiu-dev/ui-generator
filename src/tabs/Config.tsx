@@ -5,7 +5,7 @@ import { ChangeEvent, Fragment, useMemo } from "react";
 import { useLocalStorage } from "../hooks";
 
 export function Config() {
-  const { columns, makeEditable, isEditable } = useConfiguration();
+  const { columns, makeEditable, isEditable, setIsDeletable, isDeletable } = useConfiguration();
   const [searchText, setSearchText] = useLocalStorage("searchText", "");
 
   const filteredColumns = useMemo(
@@ -31,6 +31,12 @@ export function Config() {
         <Flex gap="2">
           <Switch size="1" defaultChecked={isEditable} onCheckedChange={(checked) => makeEditable(checked)} />
           Editable Table
+        </Flex>
+      </Text>
+      <Text as="label" size="2">
+        <Flex gap="2">
+          <Switch size="1" defaultChecked={isDeletable} onCheckedChange={(checked) => setIsDeletable(checked)} />
+          Can delete row
         </Flex>
       </Text>
       <TextField.Root size="1" value={searchText} onChange={handleSearch} placeholder="Search..." />

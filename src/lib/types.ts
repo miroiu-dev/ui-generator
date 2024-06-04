@@ -24,6 +24,7 @@ export type Column = {
   editable: boolean;
   meta: Meta;
   exclude: boolean;
+  isLink?: boolean;
 } & {
   editable: false;
   dataType?: ColumnType;

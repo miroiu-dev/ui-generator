@@ -7,7 +7,7 @@ import { toCamelCase, toSlug } from "../lib/parser";
 import pluralize from "pluralize";
 
 export function Listing() {
-  const { columns, name } = useConfiguration();
+  const { columns, name, isDeletable, isEditable } = useConfiguration();
   const { code, error, generate } = useTemplate({
     parameters: {
       columns: columns.filter((x) => !x.exclude),
@@ -16,6 +16,8 @@ export function Listing() {
       camelCaseName: toCamelCase(name),
       pluralName: pluralize(name),
       pluralNameCamelCase: pluralize(toCamelCase(name)),
+      isEditable,
+      isDeletable,
     },
     templateName: "columns",
     dir: "listing",
