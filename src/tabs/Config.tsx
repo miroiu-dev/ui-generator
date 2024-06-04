@@ -1,14 +1,29 @@
 import { useConfiguration } from "../providers/useConfiguration";
 import { Column } from "../components/Column";
-import { Flex, Separator, Switch, Text } from "@radix-ui/themes";
-import { Fragment } from "react";
+import { Flex, Separator, Switch, Text, TextField } from "@radix-ui/themes";
+import { ChangeEvent, Fragment, useMemo } from "react";
+import { useLocalStorage } from "../hooks";
 
 export function Config() {
   const { columns, makeEditable, isEditable } = useConfiguration();
+  const [searchText, setSearchText] = useLocalStorage("searchText", "");
+
+  const filteredColumns = useMemo(
+    () =>
+      columns.filter(
+        (c) => c.accessorKey.toLowerCase().includes(searchText.toLowerCase()) || c.header.toLowerCase().includes(searchText.toLowerCase())
+      ),
+    [columns, searchText]
+  );
 
   if (columns.length === 0) {
     return <Text>Please parse columns first!</Text>;
   }
+
+  const handleSearch = (ev: ChangeEvent<HTMLInputElement>) => {
+    const newSearchText = ev.target.value;
+    setSearchText(newSearchText);
+  };
 
   return (
     <Flex direction="column" gap="4">
@@ -18,7 +33,8 @@ export function Config() {
           Editable Table
         </Flex>
       </Text>
-      {columns.map((c) => (
+      <TextField.Root size="1" value={searchText} onChange={handleSearch} placeholder="Search..." />
+      {filteredColumns.map((c) => (
         <Fragment key={c.accessorKey}>
           <Column column={c} />
           <Separator size="4" />
